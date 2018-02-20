@@ -1,0 +1,4 @@
+DEBUG:jack_kerouac:test_search_no_parms
+INFO:jack_kerouac:['PURPLE CAR: 50', 'GREEN CAR: 25']
+DEBUG:jack_kerouac:test_search_parms
+INFO:jack_kerouac:['PURPLE CAR: 50']
