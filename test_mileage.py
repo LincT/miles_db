@@ -3,7 +3,7 @@ import sqlite3
 import logging
 from unittest import TestCase, main
 from unittest.mock import patch
-logging.basicConfig(level=logging.DEBUG, filename='mileage.log')
+logging.basicConfig(level=logging.DEBUG, filename='mileage.log', filemode='w')
 logger = logging.getLogger("jack_kerouac")  # on the road
 
 
@@ -20,6 +20,26 @@ class TestMileageDB(TestCase):
         conn.execute('DELETE FROM miles')
         conn.commit()
         conn.close()
+
+    def test_valid_numbers(self):
+        # check to verify number strings can have actual numeric values
+        # value ranges not checked as that's business logic
+
+        # should all be false:
+        self.assertFalse(mileage.validate_number("pizza"))
+        self.assertFalse(mileage.validate_number("three"))
+        self.assertFalse(mileage.validate_number("1..0"))
+        self.assertFalse(mileage.validate_number("1.2.3.5.8.13"))
+
+        # should all be true
+        self.assertFalse(mileage.validate_number("1,000.00"))
+        self.assertFalse(mileage.validate_number("1,000.01"))
+        self.assertTrue(mileage.validate_number("1.0"))
+        self.assertTrue(mileage.validate_number("0.1"))
+        self.assertTrue(mileage.validate_number("0"))
+        self.assertTrue(mileage.validate_number("1"))
+        self.assertTrue(mileage.validate_number("-1.5"))
+        self.assertTrue(mileage.validate_number("0112358.13"))
 
     def test_add_new_vehicle(self):
         mileage.add_miles('Blue Car', 100)
@@ -39,11 +59,9 @@ class TestMileageDB(TestCase):
         expected['Red Car'.upper()] = 100 + 50
         self.compare_db_to_expected(expected)
 
-
     def test_add_new_vehicle_no_vehicle(self):
         with self.assertRaises(Exception):
             mileage.addMiles(None, 100)
-
 
     def test_add_new_vehicle_invalid_new_miles(self):
         with self.assertRaises(Exception):
@@ -53,6 +71,15 @@ class TestMileageDB(TestCase):
         with self.assertRaises(Exception):
             mileage.addMiles('Car', '12.def')
 
+    @patch('builtins.print')
+    def test_search_parms(self, mock_print):
+        mileage.add_miles('purple car', 50)
+        self.assertIn("PURPLE CAR", str(mileage.search_entries('purple car'.upper())))
+
+    @patch('builtins.print')
+    def test_search_no_parms(self, mock_print):
+        mileage.add_miles('purple car', 50)
+        self.assertIn("PURPLE CAR", str(mileage.search_entries('')))
 
     # This is not a test method, instead, it's used by the test methods
     def compare_db_to_expected(self, expected):
