@@ -22,20 +22,20 @@ class TestMileageDB(TestCase):
         conn.close()
 
     def test_add_new_vehicle(self):
-        mileage.add_miles('Blue Car', 100.0)
+        mileage.add_miles('Blue Car', 100)
         expected = {'Blue Car'.upper(): 100}
         self.compare_db_to_expected(expected)
 
-        mileage.add_miles('Green Car', 50.0)
+        mileage.add_miles('Green Car', 50)
         expected['Green Car'.upper()] = 50
         self.compare_db_to_expected(expected)
 
     def test_increase_miles_for_vehicle(self):
-        mileage.add_miles('Red Car', 100.0)
+        mileage.add_miles('Red Car', 100)
         expected = {'Red Car'.upper(): 100}
         self.compare_db_to_expected(expected)
 
-        mileage.add_miles('Red Car', 50.0)
+        mileage.add_miles('Red Car', 50)
         expected['Red Car'.upper()] = 100 + 50
         self.compare_db_to_expected(expected)
 
